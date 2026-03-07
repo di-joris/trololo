@@ -47,7 +47,7 @@ struct BoardCommand: AsyncParsableCommand {
                 if card.due != nil && card.dueComplete != true { indicators.append("due") }
                 if card.dueComplete == true { indicators.append("done") }
                 let suffix = indicators.isEmpty ? "" : " (\(indicators.joined(separator: ", ")))"
-                print("\(name)\(suffix)")
+                print("\(name)\(suffix)\t\(card.id)")
             }
         }
     }
