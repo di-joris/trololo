@@ -1,5 +1,8 @@
 import Testing
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 @testable import TrelloAPI
 
 /// A mock HTTP client that returns preconfigured responses.
@@ -232,5 +235,34 @@ struct MembersBoardsAPITests {
         let requests = await capture.requests
         let url = try #require(requests.first?.url)
         #expect(url.path.hasSuffix("/members/user789/boards"))
+    }
+}
+
+@Suite("Boards cards API endpoint")
+struct BoardsCardsAPITests {
+    @Test("getBoardCards sends request to /boards/{id}/cards")
+    func getBoardCards() async throws {
+        let cardsJSON = """
+        [
+            { "id": "card1", "name": "First Card" },
+            { "id": "card2", "name": "Second Card", "closed": true }
+        ]
+        """.data(using: .utf8)!
+
+        let capture = RequestCapture()
+        let mock = MockHTTPClient.capturing(into: capture, data: cardsJSON)
+        let client = TrelloClient(apiKey: "key", apiToken: "token", httpClient: mock)
+
+        let cards = try await client.getBoardCards(boardId: "board123")
+
+        #expect(cards.count == 2)
+        #expect(cards[0].id == "card1")
+        #expect(cards[0].name == "First Card")
+        #expect(cards[1].id == "card2")
+        #expect(cards[1].closed == true)
+
+        let requests = await capture.requests
+        let url = try #require(requests.first?.url)
+        #expect(url.path.hasSuffix("/boards/board123/cards"))
     }
 }
