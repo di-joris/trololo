@@ -1,6 +1,5 @@
 import ArgumentParser
 import TrelloAPI
-import Foundation
 
 struct CardCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
@@ -8,20 +7,6 @@ struct CardCommand: AsyncParsableCommand {
         abstract: "Manage Trello cards.",
         subcommands: [View.self]
     )
-
-    private static func makeClient() throws -> TrelloClient {
-        Environment.load()
-
-        guard let apiKey = ProcessInfo.processInfo.environment["TRELLO_API_KEY"],
-              !apiKey.isEmpty else {
-            throw TrelloAPIError.missingCredentials
-        }
-        guard let apiToken = ProcessInfo.processInfo.environment["TRELLO_API_TOKEN"],
-              !apiToken.isEmpty else {
-            throw TrelloAPIError.missingCredentials
-        }
-        return TrelloClient(apiKey: apiKey, apiToken: apiToken)
-    }
 
     struct View: AsyncParsableCommand {
         static let configuration = CommandConfiguration(
@@ -34,7 +19,7 @@ struct CardCommand: AsyncParsableCommand {
         var id: String
 
         func run() async throws {
-            let client = try CardCommand.makeClient()
+            let client = try ClientFactory.makeClient()
             let card = try await client.getCard(id: id)
             let fields = Self.cardFields(card)
             print(globalOptions.outputFormat.formatter.formatRecord(fields: fields))

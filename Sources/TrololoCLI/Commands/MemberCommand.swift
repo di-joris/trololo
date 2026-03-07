@@ -1,6 +1,5 @@
 import ArgumentParser
 import TrelloAPI
-import Foundation
 
 struct MemberCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
@@ -8,20 +7,6 @@ struct MemberCommand: AsyncParsableCommand {
         abstract: "Manage Trello members.",
         subcommands: [Me.self, Boards.self]
     )
-
-    private static func makeClient() throws -> TrelloClient {
-        Environment.load()
-
-        guard let apiKey = ProcessInfo.processInfo.environment["TRELLO_API_KEY"],
-              !apiKey.isEmpty else {
-            throw TrelloAPIError.missingCredentials
-        }
-        guard let apiToken = ProcessInfo.processInfo.environment["TRELLO_API_TOKEN"],
-              !apiToken.isEmpty else {
-            throw TrelloAPIError.missingCredentials
-        }
-        return TrelloClient(apiKey: apiKey, apiToken: apiToken)
-    }
 
     struct Me: AsyncParsableCommand {
         static let configuration = CommandConfiguration(
@@ -31,7 +16,7 @@ struct MemberCommand: AsyncParsableCommand {
         @OptionGroup var globalOptions: GlobalOptions
 
         func run() async throws {
-            let client = try MemberCommand.makeClient()
+            let client = try ClientFactory.makeClient()
             let member = try await client.getMember(id: "me")
             let fields = Self.memberFields(member)
             print(globalOptions.outputFormat.formatter.formatRecord(fields: fields))
@@ -63,7 +48,7 @@ struct MemberCommand: AsyncParsableCommand {
         var member: String = "me"
 
         func run() async throws {
-            let client = try MemberCommand.makeClient()
+            let client = try ClientFactory.makeClient()
             let boards = try await client.getMemberBoards(memberId: member)
 
             if boards.isEmpty {
