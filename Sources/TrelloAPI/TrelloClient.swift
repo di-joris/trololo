@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// Errors that can occur when communicating with the Trello API.
 public enum TrelloAPIError: Error, LocalizedError, Equatable, Sendable {
