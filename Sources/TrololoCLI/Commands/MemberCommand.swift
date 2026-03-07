@@ -70,7 +70,7 @@ struct MemberCommand: AsyncParsableCommand {
                 if board.closed == true { indicators.append("closed") }
                 if board.starred == true { indicators.append("★") }
                 let suffix = indicators.isEmpty ? "" : " (\(indicators.joined(separator: ", ")))"
-                print("\(name)\(suffix)")
+                print("\(name)\(suffix)\t\(board.id)")
             }
         }
     }
