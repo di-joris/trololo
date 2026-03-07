@@ -28,22 +28,27 @@ struct MemberCommand: AsyncParsableCommand {
             abstract: "Display the authenticated member's profile."
         )
 
+        @OptionGroup var globalOptions: GlobalOptions
+
         func run() async throws {
             let client = try MemberCommand.makeClient()
             let member = try await client.getMember(id: "me")
-            Self.printMember(member)
+            let fields = Self.memberFields(member)
+            print(globalOptions.outputFormat.formatter.formatRecord(fields: fields))
         }
 
-        private static func printMember(_ member: Member) {
-            print("Username:  \(member.username ?? "—")")
-            print("Full Name: \(member.fullName ?? "—")")
-            print("Initials:  \(member.initials ?? "—")")
-            print("Email:     \(member.email ?? "—")")
-            print("Bio:       \(member.bio ?? "—")")
-            print("URL:       \(member.url ?? "—")")
-            print("Type:      \(member.memberType ?? "—")")
-            print("Status:    \(member.status ?? "—")")
-            print("ID:        \(member.id)")
+        static func memberFields(_ member: Member) -> [(label: String, value: String)] {
+            [
+                ("Username", member.username ?? "—"),
+                ("Full Name", member.fullName ?? "—"),
+                ("Initials", member.initials ?? "—"),
+                ("Email", member.email ?? "—"),
+                ("Bio", member.bio ?? "—"),
+                ("URL", member.url ?? "—"),
+                ("Type", member.memberType ?? "—"),
+                ("Status", member.status ?? "—"),
+                ("ID", member.id),
+            ]
         }
     }
 
@@ -51,6 +56,8 @@ struct MemberCommand: AsyncParsableCommand {
         static let configuration = CommandConfiguration(
             abstract: "List boards the member belongs to."
         )
+
+        @OptionGroup var globalOptions: GlobalOptions
 
         @Option(name: [.short, .long], help: "Member ID or username (defaults to authenticated user).")
         var member: String = "me"
@@ -64,14 +71,16 @@ struct MemberCommand: AsyncParsableCommand {
                 return
             }
 
-            for board in boards {
+            let headers = ["Name", "ID"]
+            let rows = boards.map { board -> [String] in
                 let name = board.name ?? board.id
                 var indicators: [String] = []
                 if board.closed == true { indicators.append("closed") }
                 if board.starred == true { indicators.append("★") }
                 let suffix = indicators.isEmpty ? "" : " (\(indicators.joined(separator: ", ")))"
-                print("\(name)\(suffix)\t\(board.id)")
+                return ["\(name)\(suffix)", board.id]
             }
+            print(globalOptions.outputFormat.formatter.formatList(headers: headers, rows: rows))
         }
     }
 }

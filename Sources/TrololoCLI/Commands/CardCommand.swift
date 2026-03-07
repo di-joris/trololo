@@ -28,30 +28,35 @@ struct CardCommand: AsyncParsableCommand {
             abstract: "Display details of a card."
         )
 
+        @OptionGroup var globalOptions: GlobalOptions
+
         @Argument(help: "The card ID.")
         var id: String
 
         func run() async throws {
             let client = try CardCommand.makeClient()
             let card = try await client.getCard(id: id)
-            Self.printCard(card)
+            let fields = Self.cardFields(card)
+            print(globalOptions.outputFormat.formatter.formatRecord(fields: fields))
         }
 
-        private static func printCard(_ card: Card) {
-            print("Name:          \(card.name ?? "—")")
-            print("Description:   \(card.desc ?? "—")")
-            print("Closed:        \(card.closed.map { String($0) } ?? "—")")
-            print("Start:         \(card.start ?? "—")")
-            print("Due:           \(card.due ?? "—")")
-            print("Due Complete:  \(card.dueComplete.map { String($0) } ?? "—")")
-            print("Board ID:      \(card.idBoard ?? "—")")
-            print("List ID:       \(card.idList ?? "—")")
-            print("Members:       \(card.idMembers.map { $0.joined(separator: ", ") } ?? "—")")
-            print("Labels:        \(card.idLabels.map { $0.joined(separator: ", ") } ?? "—")")
-            print("Last Activity: \(card.dateLastActivity ?? "—")")
-            print("URL:           \(card.url ?? "—")")
-            print("Short URL:     \(card.shortUrl ?? "—")")
-            print("ID:            \(card.id)")
+        static func cardFields(_ card: Card) -> [(label: String, value: String)] {
+            [
+                ("Name", card.name ?? "—"),
+                ("Description", card.desc ?? "—"),
+                ("Closed", card.closed.map { String($0) } ?? "—"),
+                ("Start", card.start ?? "—"),
+                ("Due", card.due ?? "—"),
+                ("Due Complete", card.dueComplete.map { String($0) } ?? "—"),
+                ("Board ID", card.idBoard ?? "—"),
+                ("List ID", card.idList ?? "—"),
+                ("Members", card.idMembers.map { $0.joined(separator: ", ") } ?? "—"),
+                ("Labels", card.idLabels.map { $0.joined(separator: ", ") } ?? "—"),
+                ("Last Activity", card.dateLastActivity ?? "—"),
+                ("URL", card.url ?? "—"),
+                ("Short URL", card.shortUrl ?? "—"),
+                ("ID", card.id),
+            ]
         }
     }
 }
