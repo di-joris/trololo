@@ -1,9 +1,9 @@
 import ArgumentParser
 
 @main
-struct TrelloCLI: AsyncParsableCommand {
+struct TrololoCLI: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "trello",
+        commandName: "trololo",
         abstract: "A command-line tool for Trello.",
         subcommands: [MemberCommand.self]
     )

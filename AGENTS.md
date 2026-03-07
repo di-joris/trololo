@@ -2,14 +2,14 @@
 
 ## Project Overview
 
-A Swift command-line tool (`trello`) for interfacing with the Trello REST API, modeled after the `gh` CLI's noun-verb structure. The OpenAPI specification is at `trello-openapi.json` (187 endpoints); online docs at <https://developer.atlassian.com/cloud/trello/rest/api-group-actions/>.
+A Swift command-line tool (`trololo`) for interfacing with the Trello REST API, modeled after the `gh` CLI's noun-verb structure. The OpenAPI specification is at `trello-openapi.json` (187 endpoints); online docs at <https://developer.atlassian.com/cloud/trello/rest/api-group-actions/>.
 
 ## Build & Test
 
 ```bash
 swift build           # Build all targets
 swift test            # Run all unit tests (21 tests, 4 suites)
-swift run trello      # Run the CLI
+swift run trololo      # Run the CLI
 ```
 
 Requires **Swift 6.0+** and **macOS 13+**. Uses strict concurrency (`Sendable`, `async/await`).
@@ -20,19 +20,19 @@ Four targets in `Package.swift`:
 
 | Target | Type | Dependencies | Purpose |
 |--------|------|-------------|---------|
-| `trello` | Executable | `TrelloAPI`, `swift-argument-parser` | CLI entry point |
+| `trololo` | Executable | `TrelloAPI`, `swift-argument-parser` | CLI entry point |
 | `TrelloAPI` | Library | Foundation | API client, models, endpoints |
 | `TrelloAPITests` | Test | `TrelloAPI` | Unit tests (Swift Testing framework) |
-| `TrelloCLITests` | Test | `trello` | CLI unit tests (.env parser, etc.) |
+| `TrololoCLITests` | Test | `trololo` | CLI unit tests (.env parser, etc.) |
 
 ```
 Sources/
-├── trello/                          # CLI executable
-│   ├── TrelloCLI.swift              # @main root command
+├── trololo/                         # CLI executable
+│   ├── TrololoCLI.swift             # @main root command
 │   ├── DotEnv.swift                 # Lightweight .env file parser
-│   ├── Environment.swift            # Loads .env files (cwd → ~/.config/trello/.env)
+│   ├── Environment.swift            # Loads .env files (cwd → ~/.config/trololo/.env)
 │   └── Commands/
-│       └── MemberCommand.swift      # `trello member me`
+│       └── MemberCommand.swift      # `trololo member me`
 └── TrelloAPI/                       # Library (reusable API client)
     ├── TrelloClient.swift           # HTTPClient protocol, TrelloClient, TrelloAPIError
     ├── Models/
@@ -44,7 +44,7 @@ Tests/
 ├── TrelloAPITests/
 │   ├── MemberDecodingTests.swift    # Model decoding tests
 │   └── TrelloClientTests.swift      # Client + endpoint tests, MockHTTPClient
-└── TrelloCLITests/
+└── TrololoCLITests/
     └── DotEnvTests.swift            # .env parser tests
 ```
 
@@ -55,22 +55,22 @@ Tests/
 export TRELLO_API_KEY="your-api-key"
 export TRELLO_API_TOKEN="your-api-token"
 
-# Or create a .env file in the current directory or ~/.config/trello/.env
+# Or create a .env file in the current directory or ~/.config/trololo/.env
 # TRELLO_API_KEY=your-api-key
 # TRELLO_API_TOKEN=your-api-token
 
-trello member me       # Display authenticated user's profile
-trello --help          # Show help
-trello member --help   # Show member subcommand help
+trololo member me       # Display authenticated user's profile
+trololo --help          # Show help
+trololo member --help   # Show member subcommand help
 ```
 
-Command pattern: `trello <noun> <verb>` (like `gh`).
+Command pattern: `trololo <noun> <verb>` (like `gh`).
 
 ## Authentication
 
 - **Trello API uses API Key + API Token** passed as query parameters (`key` and `token`) on every request.
 - The CLI reads credentials from `TRELLO_API_KEY` and `TRELLO_API_TOKEN` environment variables, or from a `.env` file.
-- `.env` file lookup order: current working directory (`.env`), then `~/.config/trello/.env`. Environment variables take priority over `.env` values.
+- `.env` file lookup order: current working directory (`.env`), then `~/.config/trololo/.env`. Environment variables take priority over `.env` values.
 - The library (`TrelloClient`) accepts credentials via its initializer — it does not read environment variables or `.env` files directly.
 
 ## Architecture

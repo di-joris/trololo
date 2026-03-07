@@ -1,4 +1,4 @@
-# trello
+# trololo
 
 A command-line tool for the [Trello REST API](https://developer.atlassian.com/cloud/trello/rest/), inspired by [GitHub CLI](https://cli.github.com).
 
@@ -10,7 +10,7 @@ Requires Swift 6.0+.
 git clone <repo-url>
 cd trello-tool
 swift build -c release
-# Binary is at .build/release/trello
+# Binary is at .build/release/trololo
 ```
 
 ## Authentication
@@ -33,14 +33,14 @@ TRELLO_API_KEY=your-api-key
 TRELLO_API_TOKEN=your-api-token
 ```
 
-The CLI looks for `.env` in the current working directory, then falls back to `~/.config/trello/.env`. Environment variables always take priority over `.env` values.
+The CLI looks for `.env` in the current working directory, then falls back to `~/.config/trololo/.env`. Environment variables always take priority over `.env` values.
 
 > **Tip:** Add `.env` to your `.gitignore` to avoid committing credentials.
 
 ## Usage
 
 ```bash
-trello member me    # Show your Trello profile
+trololo member me    # Show your Trello profile
 ```
 
 Example output:
