@@ -8,7 +8,7 @@ A Swift command-line tool (`trello`) for interfacing with the Trello REST API, m
 
 ```bash
 swift build           # Build all targets
-swift test            # Run all unit tests (11 tests, 3 suites)
+swift test            # Run all unit tests (21 tests, 4 suites)
 swift run trello      # Run the CLI
 ```
 
@@ -16,18 +16,21 @@ Requires **Swift 6.0+** and **macOS 13+**. Uses strict concurrency (`Sendable`, 
 
 ## Package Structure
 
-Three targets in `Package.swift`:
+Four targets in `Package.swift`:
 
 | Target | Type | Dependencies | Purpose |
 |--------|------|-------------|---------|
 | `trello` | Executable | `TrelloAPI`, `swift-argument-parser` | CLI entry point |
 | `TrelloAPI` | Library | Foundation | API client, models, endpoints |
 | `TrelloAPITests` | Test | `TrelloAPI` | Unit tests (Swift Testing framework) |
+| `TrelloCLITests` | Test | `trello` | CLI unit tests (.env parser, etc.) |
 
 ```
 Sources/
 ├── trello/                          # CLI executable
 │   ├── TrelloCLI.swift              # @main root command
+│   ├── DotEnv.swift                 # Lightweight .env file parser
+│   ├── Environment.swift            # Loads .env files (cwd → ~/.config/trello/.env)
 │   └── Commands/
 │       └── MemberCommand.swift      # `trello member me`
 └── TrelloAPI/                       # Library (reusable API client)
@@ -38,17 +41,23 @@ Sources/
         └── MembersAPI.swift         # getMember(id:) extension
 
 Tests/
-└── TrelloAPITests/
-    ├── MemberDecodingTests.swift    # Model decoding tests
-    └── TrelloClientTests.swift      # Client + endpoint tests, MockHTTPClient
+├── TrelloAPITests/
+│   ├── MemberDecodingTests.swift    # Model decoding tests
+│   └── TrelloClientTests.swift      # Client + endpoint tests, MockHTTPClient
+└── TrelloCLITests/
+    └── DotEnvTests.swift            # .env parser tests
 ```
 
 ## CLI Usage
 
 ```bash
-# Requires environment variables
+# Requires credentials (environment variables or .env file)
 export TRELLO_API_KEY="your-api-key"
 export TRELLO_API_TOKEN="your-api-token"
+
+# Or create a .env file in the current directory or ~/.config/trello/.env
+# TRELLO_API_KEY=your-api-key
+# TRELLO_API_TOKEN=your-api-token
 
 trello member me       # Display authenticated user's profile
 trello --help          # Show help
@@ -60,8 +69,9 @@ Command pattern: `trello <noun> <verb>` (like `gh`).
 ## Authentication
 
 - **Trello API uses API Key + API Token** passed as query parameters (`key` and `token`) on every request.
-- The CLI reads credentials from `TRELLO_API_KEY` and `TRELLO_API_TOKEN` environment variables.
-- The library (`TrelloClient`) accepts credentials via its initializer — it does not read environment variables directly.
+- The CLI reads credentials from `TRELLO_API_KEY` and `TRELLO_API_TOKEN` environment variables, or from a `.env` file.
+- `.env` file lookup order: current working directory (`.env`), then `~/.config/trello/.env`. Environment variables take priority over `.env` values.
+- The library (`TrelloClient`) accepts credentials via its initializer — it does not read environment variables or `.env` files directly.
 
 ## Architecture
 

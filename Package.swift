@@ -29,5 +29,9 @@ let package = Package(
             name: "TrelloAPITests",
             dependencies: ["TrelloAPI"]
         ),
+        .testTarget(
+            name: "TrelloCLITests",
+            dependencies: ["trello"]
+        ),
     ]
 )

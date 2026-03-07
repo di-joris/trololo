@@ -21,6 +21,8 @@ struct MemberCommand: AsyncParsableCommand {
         }
 
         private static func makeClient() throws -> TrelloClient {
+            Environment.load()
+
             guard let apiKey = ProcessInfo.processInfo.environment["TRELLO_API_KEY"],
                   !apiKey.isEmpty else {
                 throw TrelloAPIError.missingCredentials

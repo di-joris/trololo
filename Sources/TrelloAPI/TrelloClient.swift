@@ -11,7 +11,7 @@ public enum TrelloAPIError: Error, LocalizedError, Equatable, Sendable {
     public var errorDescription: String? {
         switch self {
         case .missingCredentials:
-            return "Missing API credentials. Set TRELLO_API_KEY and TRELLO_API_TOKEN environment variables."
+            return "Missing API credentials. Set TRELLO_API_KEY and TRELLO_API_TOKEN as environment variables or in a .env file."
         case .invalidURL(let url):
             return "Invalid URL: \(url)"
         case .httpError(let statusCode, let body):
