@@ -266,3 +266,27 @@ struct BoardsCardsAPITests {
         #expect(url.path.hasSuffix("/boards/board123/cards"))
     }
 }
+
+@Suite("Cards API endpoint")
+struct CardsAPITests {
+    @Test("getCard sends request to /cards/{id}")
+    func getCardById() async throws {
+        let cardJSON = """
+        { "id": "card123", "name": "My Card", "desc": "A description" }
+        """.data(using: .utf8)!
+
+        let capture = RequestCapture()
+        let mock = MockHTTPClient.capturing(into: capture, data: cardJSON)
+        let client = TrelloClient(apiKey: "key", apiToken: "token", httpClient: mock)
+
+        let card = try await client.getCard(id: "card123")
+
+        #expect(card.id == "card123")
+        #expect(card.name == "My Card")
+        #expect(card.desc == "A description")
+
+        let requests = await capture.requests
+        let url = try #require(requests.first?.url)
+        #expect(url.path.hasSuffix("/cards/card123"))
+    }
+}

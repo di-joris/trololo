@@ -14,6 +14,9 @@ public struct Card: Codable, Sendable, Equatable {
     public let shortUrl: String?
     public let pos: Double?
     public let idMembers: [String]?
+    public let dateLastActivity: String?
+    public let idLabels: [String]?
+    public let start: String?
 
     public init(
         id: String,
@@ -27,7 +30,10 @@ public struct Card: Codable, Sendable, Equatable {
         url: String? = nil,
         shortUrl: String? = nil,
         pos: Double? = nil,
-        idMembers: [String]? = nil
+        idMembers: [String]? = nil,
+        dateLastActivity: String? = nil,
+        idLabels: [String]? = nil,
+        start: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -41,5 +47,8 @@ public struct Card: Codable, Sendable, Equatable {
         self.shortUrl = shortUrl
         self.pos = pos
         self.idMembers = idMembers
+        self.dateLastActivity = dateLastActivity
+        self.idLabels = idLabels
+        self.start = start
     }
 }

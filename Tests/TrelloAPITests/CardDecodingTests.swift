@@ -19,7 +19,10 @@ struct CardDecodingTests {
             "url": "https://trello.com/c/abc123/1-my-card",
             "shortUrl": "https://trello.com/c/abc123",
             "pos": 65535.5,
-            "idMembers": ["member1", "member2"]
+            "idMembers": ["member1", "member2"],
+            "dateLastActivity": "2025-12-30T08:00:00.000Z",
+            "idLabels": ["label1", "label2"],
+            "start": "2025-12-01T09:00:00.000Z"
         }
         """.data(using: .utf8)!
 
@@ -37,6 +40,9 @@ struct CardDecodingTests {
         #expect(card.shortUrl == "https://trello.com/c/abc123")
         #expect(card.pos == 65535.5)
         #expect(card.idMembers == ["member1", "member2"])
+        #expect(card.dateLastActivity == "2025-12-30T08:00:00.000Z")
+        #expect(card.idLabels == ["label1", "label2"])
+        #expect(card.start == "2025-12-01T09:00:00.000Z")
     }
 
     @Test("Decodes a minimal card JSON with only required fields")
@@ -59,6 +65,9 @@ struct CardDecodingTests {
         #expect(card.shortUrl == nil)
         #expect(card.pos == nil)
         #expect(card.idMembers == nil)
+        #expect(card.dateLastActivity == nil)
+        #expect(card.idLabels == nil)
+        #expect(card.start == nil)
     }
 
     @Test("Round-trips through encode and decode")
@@ -75,7 +84,10 @@ struct CardDecodingTests {
             url: "https://trello.com/c/abc123/1-test-card",
             shortUrl: "https://trello.com/c/abc123",
             pos: 1024.0,
-            idMembers: ["m1"]
+            idMembers: ["m1"],
+            dateLastActivity: "2025-06-15T12:00:00.000Z",
+            idLabels: ["lbl1"],
+            start: "2025-06-01T08:00:00.000Z"
         )
 
         let data = try JSONEncoder().encode(original)
