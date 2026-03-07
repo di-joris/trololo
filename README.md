@@ -8,7 +8,7 @@ Requires Swift 6.0+.
 
 ```bash
 git clone <repo-url>
-cd trello-tool
+cd trololo
 swift build -c release
 # Binary is at .build/release/trololo
 ```
