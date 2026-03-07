@@ -1,7 +1,7 @@
 import Foundation
 
 extension TrelloClient {
-    /// Fetches all open cards on a board.
+    /// Gets all of the open cards on a board.
     ///
     /// - Parameter boardId: The board ID.
     /// - Returns: The cards on the board.
