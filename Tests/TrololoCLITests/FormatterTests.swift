@@ -37,24 +37,35 @@ struct FormatterTests {
 
     // MARK: - TextFormatter — List
 
-    @Test("Text list joins columns with tabs and rows with newlines")
+    @Test("Text list renders aligned columns with headers")
     func textListBasic() {
         let formatter = TextFormatter()
         let result = formatter.formatList(
             headers: ["Name", "ID"],
             rows: [["Board A", "id1"], ["Board B", "id2"]]
         )
-        #expect(result == "Board A\tid1\nBoard B\tid2")
+        #expect(result == """
+        Name     ID
+        -------  ---
+        Board A  id1
+        Board B  id2
+        """)
     }
 
-    @Test("Text list omits header row")
-    func textListNoHeaders() {
+    @Test("Text list aligns to the widest cell in each column")
+    func textListAlignment() {
         let formatter = TextFormatter()
         let result = formatter.formatList(
-            headers: ["Name", "ID"],
-            rows: [["Only Row", "id1"]]
+            headers: ["Name", "Board ID"],
+            rows: [["Short", "b1"], ["Longer board name", "board-123"]]
         )
-        #expect(!result.contains("Name"))
+
+        #expect(result == """
+        Name               Board ID
+        -----------------  ---------
+        Short              b1
+        Longer board name  board-123
+        """)
     }
 
     @Test("Text list with empty rows returns empty string")

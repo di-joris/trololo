@@ -10,6 +10,23 @@ struct TablePresentation: Sendable, Equatable {
     }
 }
 
+enum CommandOutput {
+    static func renderRecord(
+        _ fields: [(label: String, value: String)],
+        using formatter: some OutputFormatter
+    ) -> String {
+        formatter.formatRecord(fields: fields)
+    }
+
+    static func renderTable(
+        _ presentation: TablePresentation,
+        using formatter: some OutputFormatter
+    ) -> String {
+        guard !presentation.isEmpty else { return presentation.emptyMessage }
+        return formatter.formatList(headers: presentation.headers, rows: presentation.rows)
+    }
+}
+
 enum TrelloPresentation {
     static func memberFields(_ member: Member) -> [(label: String, value: String)] {
         [
