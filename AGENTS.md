@@ -20,14 +20,14 @@ Four targets in `Package.swift`:
 
 | Target | Type | Dependencies | Purpose |
 |--------|------|-------------|---------|
-| `trololo` | Executable | `TrelloAPI`, `swift-argument-parser` | CLI entry point |
+| `TrololoCLI` | Executable | `TrelloAPI`, `swift-argument-parser` | CLI entry point |
 | `TrelloAPI` | Library | Foundation | API client, models, endpoints |
 | `TrelloAPITests` | Test | `TrelloAPI` | Unit tests (Swift Testing framework) |
-| `TrololoCLITests` | Test | `trololo` | CLI unit tests (.env parser, etc.) |
+| `TrololoCLITests` | Test | `TrololoCLI` | CLI unit tests (.env parser, etc.) |
 
 ```
 Sources/
-├── trololo/                         # CLI executable
+├── TrololoCLI/                      # CLI executable
 │   ├── TrololoCLI.swift             # @main root command
 │   ├── DotEnv.swift                 # Lightweight .env file parser
 │   ├── Environment.swift            # Loads .env files (cwd → ~/.config/trololo/.env)

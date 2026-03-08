@@ -1,4 +1,4 @@
-# trololo
+# Trololo
 
 A command-line tool for the [Trello REST API](https://developer.atlassian.com/cloud/trello/rest/), inspired by [GitHub CLI](https://cli.github.com).
 

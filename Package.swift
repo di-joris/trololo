@@ -3,12 +3,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "trololo",
+    name: "Trololo",
     platforms: [
         .macOS(.v13),
     ],
     products: [
-        .executable(name: "trololo", targets: ["trololo"]),
+        .executable(name: "trololo", targets: ["TrololoCLI"]),
         .library(name: "TrelloAPI", targets: ["TrelloAPI"]),
     ],
     dependencies: [
@@ -16,7 +16,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "trololo",
+            name: "TrololoCLI",
             dependencies: [
                 "TrelloAPI",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
@@ -31,7 +31,7 @@ let package = Package(
         ),
         .testTarget(
             name: "TrololoCLITests",
-            dependencies: ["trololo"]
+            dependencies: ["TrololoCLI"]
         ),
     ]
 )

@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-@testable import trololo
+@testable import TrololoCLI
 
 #if canImport(Darwin)
 import Darwin
