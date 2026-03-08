@@ -2,137 +2,110 @@
 
 ## Project Overview
 
-A Swift command-line tool (`trololo`) for interfacing with the Trello REST API, modeled after the `gh` CLI's noun-verb structure. The OpenAPI specification is at `trello-openapi.json` (187 endpoints); online docs at <https://developer.atlassian.com/cloud/trello/rest/api-group-actions/>.
+`trololo` is a Swift command-line client for the Trello REST API, modeled after the `gh` CLI's noun-verb structure.
+The OpenAPI spec lives in `trello-openapi.json`; Trello's REST docs are at <https://developer.atlassian.com/cloud/trello/rest/api-group-actions/>.
 
 ## Build & Test
 
 ```bash
-swift build           # Build all targets
-swift test            # Run all unit tests (21 tests, 4 suites)
-swift run trololo      # Run the CLI
+swift build
+swift test
+swift run trololo
 ```
 
-Requires **Swift 6.0+** and **macOS 13+**. Uses strict concurrency (`Sendable`, `async/await`).
+Requires **Swift 6.0+** and **macOS 13+**. The package uses Swift Concurrency (`async/await`, `Sendable`) throughout.
 
-## Package Structure
+## Package Layout
 
-Four targets in `Package.swift`:
+### `TrololoCLI` (executable target)
+- `TrololoCLI.swift` — `@main` root command
+- `ClientFactory.swift` — credential resolution and `TrelloClient` construction
+- `Environment.swift` / `DotEnv.swift` — process environment + `.env` merging
+- `GlobalOptions.swift` — shared CLI flags
+- `Formatting/` — `OutputFormatter`, `OutputFormat`, `TextFormatter`, `CSVFormatter`, `TrelloPresentation`
+- `Commands/` — noun commands: `member`, `board`, `card`, `list`
 
-| Target | Type | Dependencies | Purpose |
-|--------|------|-------------|---------|
-| `TrololoCLI` | Executable | `TrelloAPI`, `swift-argument-parser` | CLI entry point |
-| `TrelloAPI` | Library | Foundation | API client, models, endpoints |
-| `TrelloAPITests` | Test | `TrelloAPI` | Unit tests (Swift Testing framework) |
-| `TrololoCLITests` | Test | `TrololoCLI` | CLI unit tests (.env parser, etc.) |
+### `TrelloAPI` (library target)
+- `TrelloClient.swift` — authenticated HTTP client and API error handling
+- `Models/` — `Member`, `Board`, `Card`, `TrelloList`, `Organization`
+- `Endpoints/` — `TrelloClient` extensions for members, boards, cards, and lists
 
-```
-Sources/
-├── TrololoCLI/                      # CLI executable
-│   ├── TrololoCLI.swift             # @main root command
-│   ├── DotEnv.swift                 # Lightweight .env file parser
-│   ├── Environment.swift            # Loads .env files (cwd → ~/.config/trololo/.env)
-│   └── Commands/
-│       └── MemberCommand.swift      # `trololo member view`
-└── TrelloAPI/                       # Library (reusable API client)
-    ├── TrelloClient.swift           # HTTPClient protocol, TrelloClient, TrelloAPIError
-    ├── Models/
-    │   └── Member.swift             # Member Codable model
-    └── Endpoints/
-        └── MembersAPI.swift         # getMember(id:) extension
+### Test Targets
+- `TrelloAPITests` — API client, endpoint, and model decoding coverage
+- `TrololoCLITests` — dotenv, environment, client factory, formatter, and presentation coverage
 
-Tests/
-├── TrelloAPITests/
-│   ├── MemberDecodingTests.swift    # Model decoding tests
-│   └── TrelloClientTests.swift      # Client + endpoint tests, MockHTTPClient
-└── TrololoCLITests/
-    └── DotEnvTests.swift            # .env parser tests
-```
+## CLI Design
 
-## CLI Usage
+Command pattern:
 
 ```bash
-# Requires credentials (environment variables or .env file)
-export TRELLO_API_KEY="your-api-key"
-export TRELLO_API_TOKEN="your-api-token"
-
-# Or create a .env file in the current directory or ~/.config/trololo/.env
-# TRELLO_API_KEY=your-api-key
-# TRELLO_API_TOKEN=your-api-token
-
-trololo member view     # Display authenticated user's profile
-trololo member view <id> # Display a specific member's profile
-trololo --help          # Show help
-trololo member --help   # Show member subcommand help
+trololo <noun> <verb> [options]
 ```
 
-Command pattern: `trololo <noun> <verb>` (like `gh`).
+Implemented nouns and verbs:
+- `member`: `view`, `boards`, `cards`, `organizations`
+- `board`: `view`, `lists`, `cards`
+- `card`: `view`
+- `list`: `view`, `cards`
 
-## Authentication
+Shared global option:
+- `--output-format text|csv`
 
-- **Trello API uses API Key + API Token** passed as query parameters (`key` and `token`) on every request.
-- The CLI reads credentials from `TRELLO_API_KEY` and `TRELLO_API_TOKEN` environment variables, or from a `.env` file.
-- `.env` file lookup order: current working directory (`.env`), then `~/.config/trololo/.env`. Environment variables take priority over `.env` values.
-- The library (`TrelloClient`) accepts credentials via its initializer — it does not read environment variables or `.env` files directly.
+Commands should stay thin: parse arguments, build a client, fetch data, render output.
 
-## Architecture
+## Authentication & Environment
 
-### TrelloClient
+- Trello authentication uses query parameters: `key` and `token`.
+- The CLI resolves credentials through `ClientFactory.makeClient()`.
+- Resolution order is:
+  1. current process environment
+  2. `.env` in the current working directory
+  3. `~/.config/trololo/.env`
+- Existing environment values always win over `.env` values.
+- Existing but unreadable `.env` files surface as errors only while the CLI still needs them to resolve missing credentials.
+- `TrelloClient` itself does **not** read environment variables or `.env` files; it only accepts explicit credentials.
 
-- Initialized with `apiKey`, `apiToken`, and an `HTTPClient` (defaults to `URLSession.shared`).
-- `makeRequest(path:queryItems:)` builds authenticated `URLRequest` objects with key/token appended.
-- `get<T: Decodable>(_:path:queryItems:)` executes GET requests and decodes responses.
-- Base URL: `https://api.trello.com/1`.
+## Output Architecture
 
-### HTTPClient Protocol
+- `TrelloPresentation` is the single place for CLI field ordering, row construction, indicator suffixes, truncation, and empty-state copy.
+- `CommandOutput` renders record or table output from `TrelloPresentation`.
+- `TextFormatter` renders aligned records and tables with headers.
+- `CSVFormatter` renders headered CSV and handles escaping.
+- New CLI output work should extend `TrelloPresentation` and the formatters instead of duplicating presentation logic in command files.
 
-```swift
-public protocol HTTPClient: Sendable {
-    func data(for request: URLRequest) async throws -> (Data, URLResponse)
-}
-```
+## API Architecture
 
-`URLSession` conforms automatically. Tests inject `MockHTTPClient` for deterministic behavior.
-
-### Error Handling
-
-`TrelloAPIError` enum with cases: `missingCredentials`, `invalidURL`, `httpError(statusCode:body:)`, `decodingError`, `networkError`. All conform to `LocalizedError`, `Equatable`, and `Sendable`.
-
-### Adding New Endpoints
-
-Follow the extension pattern in `Endpoints/MembersAPI.swift`:
-
-```swift
-extension TrelloClient {
-    public func getBoards(memberId: String = "me") async throws -> [Board] {
-        try await get([Board].self, path: "/members/\(memberId)/boards")
-    }
-}
-```
-
-1. Add a Codable model in `Models/`.
-2. Add an endpoint extension in `Endpoints/`.
-3. Add a CLI subcommand in `Commands/`.
+- `TrelloClient` is initialized with `apiKey`, `apiToken`, and an optional `HTTPClient` (defaults to `URLSession.shared`).
+- `makeRequest(path:queryItems:)` appends Trello auth parameters to each request.
+- `get(_:path:queryItems:)` performs GET requests and decodes `Decodable` models.
+- Endpoints are added as `TrelloClient` extensions under `Sources/TrelloAPI/Endpoints/`.
+- Models conform to `Codable`, `Sendable`, and `Equatable`; most fields are optional because Trello responses vary by endpoint and query parameters.
 
 ## Testing
 
-Uses **Swift Testing** framework (`@Test`, `#expect`, `#require`). Key test helpers:
+The project uses **Swift Testing** (`@Test`, `#expect`, `#require`).
 
-- **`MockHTTPClient`** — Configurable mock with factory methods: `.success(data:)`, `.httpError(statusCode:body:)`, `.capturing(into:data:)`.
-- **`RequestCapture`** — Actor for thread-safe request inspection in async tests.
+Key testing patterns:
+- API tests use `MockHTTPClient` and `RequestCapture` from `Tests/TrelloAPITests/TrelloClientTests.swift`.
+- CLI tests cover dotenv parsing, merged environment behavior, client factory credential resolution, formatter behavior, and presentation mapping.
+- For isolated `ClientFactory` tests, inject `environment` and pass `paths: []` when you want to disable local `.env` fallback.
 
-Tests cover: model decoding (full/minimal/round-trip), URL construction, auth parameter injection, HTTP error codes (parameterized), decoding errors, and endpoint request paths.
+Run `swift test` after code changes; it validates both the API and CLI layers.
 
-## Trello API Reference
+## Adding New Features
 
-- OpenAPI spec: `trello-openapi.json` (OpenAPI 3.0, 187 paths)
-- Base URL: `https://api.trello.com/1`
-- Auth: query params `key` (32-char hex) and `token`
-- Key schemas: `Member`, `TrelloID` (24-char hex string)
-- The `{id}` parameter in `/members/{id}` accepts `"me"` as a special value for the authenticated user.
+When adding a new Trello surface:
+1. Add or update a model in `Sources/TrelloAPI/Models/` if needed.
+2. Add an endpoint method as a `TrelloClient` extension in `Sources/TrelloAPI/Endpoints/`.
+3. Add or extend a CLI command in `Sources/TrololoCLI/Commands/`.
+4. Add presentation mapping in `Sources/TrololoCLI/Formatting/TrelloPresentation.swift`.
+5. Add or update tests in both `TrelloAPITests` and `TrololoCLITests` as appropriate.
+6. Update `README.md` if the user-facing CLI changes.
 
 ## Conventions
 
-- Incremental git commits at logical boundaries.
-- All public types are `Sendable` for Swift concurrency safety.
-- Optional fields in models (the API may omit fields depending on query parameters).
-- CLI uses `AsyncParsableCommand` for async endpoint calls.
+- Use incremental git commits at logical boundaries.
+- Keep public APIs concurrency-safe (`Sendable` where appropriate).
+- Prefer `AsyncParsableCommand` for CLI commands.
+- Keep credential loading centralized in `ClientFactory`.
+- Keep rendering logic centralized in `TrelloPresentation` and formatter types rather than inline in commands.
