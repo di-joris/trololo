@@ -5,19 +5,22 @@ struct MemberCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "member",
         abstract: "Manage Trello members.",
-        subcommands: [Me.self, Boards.self]
+        subcommands: [View.self, Boards.self]
     )
 
-    struct Me: AsyncParsableCommand {
+    struct View: AsyncParsableCommand {
         static let configuration = CommandConfiguration(
-            abstract: "Display the authenticated member's profile."
+            abstract: "Display a member's profile."
         )
 
         @OptionGroup var globalOptions: GlobalOptions
 
+        @Argument(help: "Member ID or username (defaults to the authenticated user).")
+        var id: String = "me"
+
         func run() async throws {
             let client = try ClientFactory.makeClient()
-            let member = try await client.getMember(id: "me")
+            let member = try await client.getMember(id: id)
             let fields = Self.memberFields(member)
             print(globalOptions.outputFormat.formatter.formatRecord(fields: fields))
         }

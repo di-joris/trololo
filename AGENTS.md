@@ -32,7 +32,7 @@ Sources/
 │   ├── DotEnv.swift                 # Lightweight .env file parser
 │   ├── Environment.swift            # Loads .env files (cwd → ~/.config/trololo/.env)
 │   └── Commands/
-│       └── MemberCommand.swift      # `trololo member me`
+│       └── MemberCommand.swift      # `trololo member view`
 └── TrelloAPI/                       # Library (reusable API client)
     ├── TrelloClient.swift           # HTTPClient protocol, TrelloClient, TrelloAPIError
     ├── Models/
@@ -59,7 +59,8 @@ export TRELLO_API_TOKEN="your-api-token"
 # TRELLO_API_KEY=your-api-key
 # TRELLO_API_TOKEN=your-api-token
 
-trololo member me       # Display authenticated user's profile
+trololo member view     # Display authenticated user's profile
+trololo member view <id> # Display a specific member's profile
 trololo --help          # Show help
 trololo member --help   # Show member subcommand help
 ```

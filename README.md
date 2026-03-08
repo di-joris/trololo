@@ -40,7 +40,8 @@ The CLI looks for `.env` in the current working directory, then falls back to `~
 ## Usage
 
 ```bash
-trololo member me    # Show your Trello profile
+trololo member view   # Show your Trello profile
+trololo member view janedoe  # Look up another member by username
 ```
 
 Example output:
