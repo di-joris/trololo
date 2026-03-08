@@ -36,15 +36,30 @@ TRELLO_API_TOKEN=your-api-token
 The CLI looks for `.env` in the current working directory, then falls back to `~/.config/trololo/.env`. Environment variables always take priority over `.env` values.
 
 > **Tip:** Add `.env` to your `.gitignore` to avoid committing credentials.
+>
+> If the CLI still needs credentials from `.env` and an existing file cannot be read, it now surfaces that as an error instead of silently ignoring it.
 
 ## Usage
 
 ```bash
-trololo member view   # Show your Trello profile
-trololo member view janedoe  # Look up another member by username
+trololo member view                  # Show your Trello profile
+trololo member boards --member me    # List your boards
+trololo board lists <board-id>       # List lists on a board
+trololo list cards <list-id>         # List cards in a list
+trololo member boards --output-format csv
+trololo member view janedoe          # Look up another member by username
 ```
 
-Example output:
+Example text output (`trololo member boards`):
+
+```
+Name               Description                                   Short URL                ID
+-----------------  --------------------------------------------  -----------------------  ------------------------
+Roadmap (★)        Team planning board                           https://trello.com/b/r  5abbe4b7ddc1b351ef961414
+Archive (closed)                                                 https://trello.com/b/a  5abbe4b7ddc1b351ef961415
+```
+
+Example record output (`trololo member view`):
 
 ```
 Username:  bentleycook
@@ -57,6 +72,8 @@ Type:      normal
 Status:    active
 ID:        5abbe4b7ddc1b351ef961414
 ```
+
+Use `--output-format csv` when you want headered CSV output for scripts or spreadsheets.
 
 ## License
 
