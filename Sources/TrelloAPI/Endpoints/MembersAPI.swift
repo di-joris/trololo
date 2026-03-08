@@ -17,6 +17,14 @@ extension TrelloClient {
         try await get([Board].self, path: "/members/\(memberId)/boards")
     }
 
+    /// Fetches cards the member is assigned to.
+    ///
+    /// - Parameter memberId: The member ID or `"me"` for the authenticated user.
+    /// - Returns: The member's cards.
+    public func getMemberCards(memberId: String = "me") async throws -> [Card] {
+        try await get([Card].self, path: "/members/\(memberId)/cards")
+    }
+
     /// Fetches the organizations (workspaces) a member belongs to.
     ///
     /// - Parameter memberId: The member ID or `"me"` for the authenticated user.

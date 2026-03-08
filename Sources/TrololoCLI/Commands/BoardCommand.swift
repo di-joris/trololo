@@ -5,8 +5,40 @@ struct BoardCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "board",
         abstract: "Manage Trello boards.",
-        subcommands: [Cards.self]
+        subcommands: [View.self, Cards.self]
     )
+
+    struct View: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Display details of a board."
+        )
+
+        @OptionGroup var globalOptions: GlobalOptions
+
+        @Argument(help: "The board ID.")
+        var id: String
+
+        func run() async throws {
+            let client = try ClientFactory.makeClient()
+            let board = try await client.getBoard(id: id)
+            let fields = Self.boardFields(board)
+            print(globalOptions.outputFormat.formatter.formatRecord(fields: fields))
+        }
+
+        static func boardFields(_ board: Board) -> [(label: String, value: String)] {
+            [
+                ("Name",         board.name         ?? "—"),
+                ("Description",  board.desc         ?? "—"),
+                ("Closed",       board.closed.map { String($0) } ?? "—"),
+                ("Starred",      board.starred.map { String($0) } ?? "—"),
+                ("Pinned",       board.pinned.map  { String($0) } ?? "—"),
+                ("Organization", board.idOrganization ?? "—"),
+                ("URL",          board.url          ?? "—"),
+                ("Short URL",    board.shortUrl     ?? "—"),
+                ("ID",           board.id),
+            ]
+        }
+    }
 
     struct Cards: AsyncParsableCommand {
         static let configuration = CommandConfiguration(

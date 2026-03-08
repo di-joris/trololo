@@ -339,3 +339,76 @@ struct MemberOrganizationsAPITests {
         #expect(url.path.hasSuffix("/members/user789/organizations"))
     }
 }
+
+@Suite("Member Cards API endpoint")
+struct MemberCardsAPITests {
+    @Test("getMemberCards sends request to /members/me/cards by default")
+    func getMemberCardsDefault() async throws {
+        let cardsJSON = """
+        [
+            { "id": "card1", "name": "First Card", "idBoard": "board1" },
+            { "id": "card2", "name": "Second Card", "due": "2025-12-31T12:00:00.000Z", "dueComplete": true }
+        ]
+        """.data(using: .utf8)!
+
+        let capture = RequestCapture()
+        let mock = MockHTTPClient.capturing(into: capture, data: cardsJSON)
+        let client = TrelloClient(apiKey: "key", apiToken: "token", httpClient: mock)
+
+        let cards = try await client.getMemberCards()
+
+        #expect(cards.count == 2)
+        #expect(cards[0].id == "card1")
+        #expect(cards[0].name == "First Card")
+        #expect(cards[0].idBoard == "board1")
+        #expect(cards[1].id == "card2")
+        #expect(cards[1].dueComplete == true)
+
+        let requests = await capture.requests
+        let url = try #require(requests.first?.url)
+        #expect(url.path.hasSuffix("/members/me/cards"))
+    }
+
+    @Test("getMemberCards sends request with custom member ID")
+    func getMemberCardsById() async throws {
+        let cardsJSON = """
+        [ { "id": "card1", "name": "A Card" } ]
+        """.data(using: .utf8)!
+
+        let capture = RequestCapture()
+        let mock = MockHTTPClient.capturing(into: capture, data: cardsJSON)
+        let client = TrelloClient(apiKey: "key", apiToken: "token", httpClient: mock)
+
+        let cards = try await client.getMemberCards(memberId: "johndoe")
+
+        #expect(cards.count == 1)
+
+        let requests = await capture.requests
+        let url = try #require(requests.first?.url)
+        #expect(url.path.hasSuffix("/members/johndoe/cards"))
+    }
+}
+
+@Suite("Board API endpoint")
+struct BoardAPITests {
+    @Test("getBoard sends request to /boards/{id}")
+    func getBoardById() async throws {
+        let boardJSON = """
+        { "id": "board123", "name": "My Board", "desc": "A description" }
+        """.data(using: .utf8)!
+
+        let capture = RequestCapture()
+        let mock = MockHTTPClient.capturing(into: capture, data: boardJSON)
+        let client = TrelloClient(apiKey: "key", apiToken: "token", httpClient: mock)
+
+        let board = try await client.getBoard(id: "board123")
+
+        #expect(board.id == "board123")
+        #expect(board.name == "My Board")
+        #expect(board.desc == "A description")
+
+        let requests = await capture.requests
+        let url = try #require(requests.first?.url)
+        #expect(url.path.hasSuffix("/boards/board123"))
+    }
+}
