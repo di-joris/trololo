@@ -5,7 +5,7 @@ struct BoardCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "board",
         abstract: "Manage Trello boards.",
-        subcommands: [View.self, Cards.self]
+        subcommands: [View.self, Cards.self, Lists.self]
     )
 
     struct View: AsyncParsableCommand {
@@ -37,6 +37,36 @@ struct BoardCommand: AsyncParsableCommand {
                 ("Short URL",    board.shortUrl     ?? "—"),
                 ("ID",           board.id),
             ]
+        }
+    }
+
+    struct Lists: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "List all lists on a board."
+        )
+
+        @OptionGroup var globalOptions: GlobalOptions
+        @Argument(help: "The board ID.")
+        var id: String
+
+        func run() async throws {
+            let client = try ClientFactory.makeClient()
+            let lists = try await client.getBoardLists(boardId: id)
+
+            if lists.isEmpty {
+                print("No lists found.")
+                return
+            }
+
+            let headers = ["Name", "ID"]
+            let rows = lists.map { list -> [String] in
+                let name = list.name ?? list.id
+                var indicators: [String] = []
+                if list.closed == true { indicators.append("closed") }
+                let suffix = indicators.isEmpty ? "" : " (\(indicators.joined(separator: ", ")))"
+                return ["\(name)\(suffix)", list.id]
+            }
+            print(globalOptions.outputFormat.formatter.formatList(headers: headers, rows: rows))
         }
     }
 
