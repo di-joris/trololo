@@ -290,3 +290,52 @@ struct CardsAPITests {
         #expect(url.path.hasSuffix("/cards/card123"))
     }
 }
+
+@Suite("Member Organizations API endpoint")
+struct MemberOrganizationsAPITests {
+    @Test("getMemberOrganizations sends request to /members/me/organizations by default")
+    func getMemberOrganizationsDefault() async throws {
+        let orgsJSON = """
+        [
+            { "id": "org1", "name": "acme-eng", "displayName": "Acme Engineering" },
+            { "id": "org2", "name": "oss-club", "idBoards": ["b1", "b2"] }
+        ]
+        """.data(using: .utf8)!
+
+        let capture = RequestCapture()
+        let mock = MockHTTPClient.capturing(into: capture, data: orgsJSON)
+        let client = TrelloClient(apiKey: "key", apiToken: "token", httpClient: mock)
+
+        let orgs = try await client.getMemberOrganizations()
+
+        #expect(orgs.count == 2)
+        #expect(orgs[0].id == "org1")
+        #expect(orgs[0].name == "acme-eng")
+        #expect(orgs[0].displayName == "Acme Engineering")
+        #expect(orgs[1].id == "org2")
+        #expect(orgs[1].idBoards == ["b1", "b2"])
+
+        let requests = await capture.requests
+        let url = try #require(requests.first?.url)
+        #expect(url.path.hasSuffix("/members/me/organizations"))
+    }
+
+    @Test("getMemberOrganizations sends request with custom member ID")
+    func getMemberOrganizationsById() async throws {
+        let orgsJSON = """
+        [ { "id": "org1", "name": "workspace" } ]
+        """.data(using: .utf8)!
+
+        let capture = RequestCapture()
+        let mock = MockHTTPClient.capturing(into: capture, data: orgsJSON)
+        let client = TrelloClient(apiKey: "key", apiToken: "token", httpClient: mock)
+
+        let orgs = try await client.getMemberOrganizations(memberId: "user789")
+
+        #expect(orgs.count == 1)
+
+        let requests = await capture.requests
+        let url = try #require(requests.first?.url)
+        #expect(url.path.hasSuffix("/members/user789/organizations"))
+    }
+}

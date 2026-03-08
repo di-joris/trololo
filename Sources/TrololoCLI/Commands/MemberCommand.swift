@@ -5,7 +5,7 @@ struct MemberCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "member",
         abstract: "Manage Trello members.",
-        subcommands: [View.self, Boards.self]
+        subcommands: [View.self, Boards.self, Organizations.self]
     )
 
     struct View: AsyncParsableCommand {
@@ -67,6 +67,38 @@ struct MemberCommand: AsyncParsableCommand {
                 if board.starred == true { indicators.append("★") }
                 let suffix = indicators.isEmpty ? "" : " (\(indicators.joined(separator: ", ")))"
                 return ["\(name)\(suffix)", board.id]
+            }
+            print(globalOptions.outputFormat.formatter.formatList(headers: headers, rows: rows))
+        }
+    }
+
+    struct Organizations: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            commandName: "organizations",
+            abstract: "List organizations (workspaces) the member belongs to.",
+            aliases: ["orgs"]
+        )
+
+        @OptionGroup var globalOptions: GlobalOptions
+
+        @Option(name: [.short, .long], help: "Member ID or username (defaults to authenticated user).")
+        var member: String = "me"
+
+        func run() async throws {
+            let client = try ClientFactory.makeClient()
+            let orgs = try await client.getMemberOrganizations(memberId: member)
+
+            if orgs.isEmpty {
+                print("No organizations found.")
+                return
+            }
+
+            let headers = ["Display Name", "Slug", "Boards", "ID"]
+            let rows = orgs.map { org -> [String] in
+                let displayName = org.displayName ?? org.name ?? org.id
+                let slug = org.name ?? "—"
+                let boardCount = org.idBoards.map { String($0.count) } ?? "—"
+                return [displayName, slug, boardCount, org.id]
             }
             print(globalOptions.outputFormat.formatter.formatList(headers: headers, rows: rows))
         }
