@@ -16,4 +16,12 @@ extension TrelloClient {
     public func getBoard(id: String) async throws -> Board {
         try await get(Board.self, path: "/boards/\(id)")
     }
+
+    /// Gets all of the lists on a board.
+    ///
+    /// - Parameter boardId: The board ID.
+    /// - Returns: The lists on the board.
+    public func getBoardLists(boardId: String) async throws -> [TrelloList] {
+        try await get([TrelloList].self, path: "/boards/\(boardId)/lists")
+    }
 }
