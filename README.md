@@ -33,7 +33,7 @@ TRELLO_API_KEY=your-api-key
 TRELLO_API_TOKEN=your-api-token
 ```
 
-The CLI looks for `.env` in the current working directory, then falls back to `~/.config/trololo/.env`. Environment variables always take priority over `.env` values.
+The CLI looks for `.env` in the current working directory, then falls back to `~/.config/trololo/env`. Environment variables always take priority over `.env` values.
 
 > **Tip:** Add `.env` to your `.gitignore` to avoid committing credentials.
 >

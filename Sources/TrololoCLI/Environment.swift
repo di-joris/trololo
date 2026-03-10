@@ -15,7 +15,7 @@ enum EnvironmentError: Error, LocalizedError, Equatable, Sendable {
 ///
 /// Lookup order:
 /// 1. `.env` in the current working directory
-/// 2. `~/.config/trololo/.env` (fallback)
+/// 2. `~/.config/trololo/env` (fallback)
 ///
 /// Missing files are ignored. Real environment variables always take priority
 /// over values from `.env` files. Existing but unreadable files surface as
@@ -23,7 +23,7 @@ enum EnvironmentError: Error, LocalizedError, Equatable, Sendable {
 enum Environment {
     static let defaultPaths = [
         ".env",
-        NSString("~/.config/trololo/.env").expandingTildeInPath,
+        NSString("~/.config/trololo/env").expandingTildeInPath,
     ]
 
     static func mergedEnvironment(

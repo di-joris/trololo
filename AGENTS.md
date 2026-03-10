@@ -60,7 +60,7 @@ Commands should stay thin: parse arguments, build a client, fetch data, render o
 - Resolution order is:
   1. current process environment
   2. `.env` in the current working directory
-  3. `~/.config/trololo/.env`
+  3. `~/.config/trololo/env`
 - Existing environment values always win over `.env` values.
 - Existing but unreadable `.env` files surface as errors only while the CLI still needs them to resolve missing credentials.
 - `TrelloClient` itself does **not** read environment variables or `.env` files; it only accepts explicit credentials.
