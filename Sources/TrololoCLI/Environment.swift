@@ -15,19 +15,26 @@ enum EnvironmentError: Error, LocalizedError, Equatable, Sendable {
 ///
 /// Lookup order:
 /// 1. `.env` in the current working directory
-/// 2. `$XDG_CONFIG_HOME/trololo/env` (fallback; defaults to `~/.config/trololo/env`)
+/// 2. `$XDG_CONFIG_HOME/trololo/env` (fallback; defaults to `$HOME/.config/trololo/env`)
 ///
 /// Missing files are ignored. Real environment variables always take priority
 /// over values from `.env` files. Existing but unreadable files surface as
 /// errors while the CLI is still resolving missing required values.
 enum Environment {
     static var defaultPaths: [String] {
-        let xdgConfigHome = ProcessInfo.processInfo.environment["XDG_CONFIG_HOME"]
-            ?? NSString("~/.config").expandingTildeInPath
-        return [
-            ".env",
-            "\(xdgConfigHome)/trololo/env",
-        ]
+        [".env", xdgConfigPath()]
+    }
+
+    /// Returns the path to the trololo config file, respecting the XDG Base Directory Specification.
+    ///
+    /// Uses `XDG_CONFIG_HOME` from the given environment when set; otherwise falls back to
+    /// `$HOME/.config` (or the expanded `~/.config` if `HOME` is also absent).
+    static func xdgConfigPath(
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> String {
+        let home = environment["HOME"] ?? NSString("~").expandingTildeInPath
+        let xdgConfigHome = environment["XDG_CONFIG_HOME"] ?? "\(home)/.config"
+        return "\(xdgConfigHome)/trololo/env"
     }
 
     static func mergedEnvironment(

@@ -99,6 +99,64 @@ struct EnvironmentTests {
         #expect(merged[ClientFactory.apiTokenEnvVar] == "env-token")
     }
 
+    // MARK: - XDG Base Directory Specification
+
+    @Test("xdgConfigPath uses XDG_CONFIG_HOME when set")
+    func xdgConfigPathUsesXDGConfigHome() {
+        let path = Environment.xdgConfigPath(environment: ["XDG_CONFIG_HOME": "/custom/config"])
+        #expect(path == "/custom/config/trololo/env")
+    }
+
+    @Test("xdgConfigPath falls back to HOME/.config when XDG_CONFIG_HOME is absent")
+    func xdgConfigPathFallsBackToHome() {
+        let path = Environment.xdgConfigPath(environment: ["HOME": "/home/user"])
+        #expect(path == "/home/user/.config/trololo/env")
+    }
+
+    @Test("xdgConfigPath ignores HOME when XDG_CONFIG_HOME is set")
+    func xdgConfigPathIgnoresHomeWhenXDGSet() {
+        let path = Environment.xdgConfigPath(environment: [
+            "HOME": "/home/user",
+            "XDG_CONFIG_HOME": "/xdg/config",
+        ])
+        #expect(path == "/xdg/config/trololo/env")
+    }
+
+    @Test("xdgConfigPath falls back to expanded tilde when both XDG_CONFIG_HOME and HOME are absent")
+    func xdgConfigPathFallsBackToTilde() {
+        let expected = "\(NSString("~").expandingTildeInPath)/.config/trololo/env"
+        let path = Environment.xdgConfigPath(environment: [:])
+        #expect(path == expected)
+    }
+
+    @Test("defaultPaths second element uses XDG config path")
+    func defaultPathsContainsXDGConfigPath() {
+        #expect(Environment.defaultPaths.count == 2)
+        #expect(Environment.defaultPaths[0] == ".env")
+        #expect(Environment.defaultPaths[1].hasSuffix("/trololo/env"))
+    }
+
+    @Test("mergedEnvironment reads from XDG_CONFIG_HOME config file")
+    func mergedEnvironmentReadsFromXDGPath() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let xdgConfigPath = Environment.xdgConfigPath(
+            environment: ["XDG_CONFIG_HOME": directory.path]
+        )
+        let configDir = URL(fileURLWithPath: xdgConfigPath).deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: configDir, withIntermediateDirectories: true)
+        try "TRELLO_API_KEY=xdg-key\nTRELLO_API_TOKEN=xdg-token"
+            .write(toFile: xdgConfigPath, atomically: true, encoding: .utf8)
+
+        let merged = try Environment.mergedEnvironment(base: [:], paths: [xdgConfigPath])
+
+        #expect(merged[ClientFactory.apiKeyEnvVar] == "xdg-key")
+        #expect(merged[ClientFactory.apiTokenEnvVar] == "xdg-token")
+    }
+
     // MARK: - Base Environment Contract
     // This test documents and validates the complete environment-loading contract.
     // The contract specifies:
