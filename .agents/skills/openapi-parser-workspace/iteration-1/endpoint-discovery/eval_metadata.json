@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "endpoint-discovery",
+  "prompt": "I have a Trello OpenAPI spec at trello-openapi.json. Can you tell me what endpoints are available for managing checklists? I want to know the paths, HTTP methods, and what parameters they accept.",
+  "assertions": [
+    {
+      "id": "lists-checklist-endpoints",
+      "text": "Lists at least 5 distinct checklist-related endpoint paths",
+      "type": "count_check"
+    },
+    {
+      "id": "includes-http-methods",
+      "text": "Shows HTTP methods (GET, POST, PUT, DELETE) for the endpoints",
+      "type": "content_check"
+    },
+    {
+      "id": "includes-parameters",
+      "text": "Lists query or path parameters for at least one endpoint",
+      "type": "content_check"
+    },
+    {
+      "id": "mentions-checkitems",
+      "text": "Covers checkItems sub-resource endpoints (e.g., /checklists/{id}/checkItems)",
+      "type": "content_check"
+    },
+    {
+      "id": "well-organized",
+      "text": "Output is organized in a structured, easy-to-scan format (not a wall of raw JSON)",
+      "type": "quality_check"
+    }
+  ]
+}

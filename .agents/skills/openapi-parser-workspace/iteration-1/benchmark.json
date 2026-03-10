@@ -1,0 +1,142 @@
+{
+  "metadata": {
+    "skill_name": "openapi-parser",
+    "skill_path": "/Users/joris/.agents/skills/openapi-parser",
+    "executor_model": "claude-opus-4.6",
+    "analyzer_model": "claude-opus-4.6",
+    "timestamp": "2026-03-10T13:37:29Z",
+    "evals_run": ["endpoint-discovery", "code-generation", "api-overview"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_name": "endpoint-discovery",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 5,
+      "total": 5,
+      "time_seconds": 51,
+      "tokens": null,
+      "expectations": [
+        {"text": "Lists at least 5 distinct checklist-related endpoint paths", "passed": true, "evidence": "Lists 18 endpoints across 4 groups"},
+        {"text": "Shows HTTP methods (GET, POST, PUT, DELETE) for the endpoints", "passed": true, "evidence": "Table includes Method column with all HTTP methods"},
+        {"text": "Lists query or path parameters for at least one endpoint", "passed": true, "evidence": "Every endpoint has a Parameters column"},
+        {"text": "Covers checkItems sub-resource endpoints", "passed": true, "evidence": "Section 2 dedicated to Check Items"},
+        {"text": "Output is organized in a structured, easy-to-scan format", "passed": true, "evidence": "4 numbered sections with markdown tables"}
+      ]
+    },
+    {
+      "eval_name": "endpoint-discovery",
+      "configuration": "without_skill",
+      "pass_rate": 1.0,
+      "passed": 5,
+      "total": 5,
+      "time_seconds": 50,
+      "tokens": null,
+      "expectations": [
+        {"text": "Lists at least 5 distinct checklist-related endpoint paths", "passed": true, "evidence": "Lists 17 endpoints across 6 groups"},
+        {"text": "Shows HTTP methods (GET, POST, PUT, DELETE) for the endpoints", "passed": true, "evidence": "Each endpoint header shows the HTTP method"},
+        {"text": "Lists query or path parameters for at least one endpoint", "passed": true, "evidence": "Detailed parameter tables per endpoint"},
+        {"text": "Covers checkItems sub-resource endpoints", "passed": true, "evidence": "Section 2 dedicated to Check-Item Endpoints"},
+        {"text": "Output is organized in a structured, easy-to-scan format", "passed": true, "evidence": "6 numbered sections with markdown tables"}
+      ]
+    },
+    {
+      "eval_name": "code-generation",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 8,
+      "total": 8,
+      "time_seconds": 89,
+      "tokens": null,
+      "expectations": [
+        {"text": "Generated Label.swift contains 'struct Label'", "passed": true, "evidence": "File contains 'public struct Label: Codable, Sendable, Equatable'"},
+        {"text": "Label struct conforms to Codable, Sendable, and Equatable", "passed": true, "evidence": "All three protocols in declaration"},
+        {"text": "The 'id' field is a non-optional String", "passed": true, "evidence": "public let id: String"},
+        {"text": "Other properties like name, color are optional (String?)", "passed": true, "evidence": "idBoard: String?, name: String?, color: String?"},
+        {"text": "Has a public init with default nil values for optional parameters", "passed": true, "evidence": "public init with = nil defaults"},
+        {"text": "LabelsAPI.swift has a TrelloClient extension with at least one label method", "passed": true, "evidence": "getLabel(id:) and getBoardLabels(boardId:)"},
+        {"text": "Tests use Swift Testing framework (@Test, #expect or #require)", "passed": true, "evidence": "Uses @Suite, @Test, #expect, #require"},
+        {"text": "Model properties match the actual Label schema fields from the OpenAPI spec", "passed": true, "evidence": "Exact 4-field match: id, idBoard, name, color"}
+      ]
+    },
+    {
+      "eval_name": "code-generation",
+      "configuration": "without_skill",
+      "pass_rate": 1.0,
+      "passed": 8,
+      "total": 8,
+      "time_seconds": 127,
+      "tokens": null,
+      "expectations": [
+        {"text": "Generated Label.swift contains 'struct Label'", "passed": true, "evidence": "File contains 'public struct Label: Codable, Sendable, Equatable'"},
+        {"text": "Label struct conforms to Codable, Sendable, and Equatable", "passed": true, "evidence": "All three protocols in declaration"},
+        {"text": "The 'id' field is a non-optional String", "passed": true, "evidence": "public let id: String"},
+        {"text": "Other properties like name, color are optional (String?)", "passed": true, "evidence": "idBoard: String?, name: String?, color: String?"},
+        {"text": "Has a public init with default nil values for optional parameters", "passed": true, "evidence": "public init with = nil defaults"},
+        {"text": "LabelsAPI.swift has a TrelloClient extension with at least one label method", "passed": true, "evidence": "getLabel(id:) and getBoardLabels(boardId:)"},
+        {"text": "Tests use Swift Testing framework (@Test, #expect or #require)", "passed": true, "evidence": "Uses @Suite, @Test, #expect, #require"},
+        {"text": "Model properties match the actual Label schema fields from the OpenAPI spec", "passed": true, "evidence": "Exact 4-field match: id, idBoard, name, color"}
+      ]
+    },
+    {
+      "eval_name": "api-overview",
+      "configuration": "with_skill",
+      "pass_rate": 1.0,
+      "passed": 6,
+      "total": 6,
+      "time_seconds": 107,
+      "tokens": null,
+      "expectations": [
+        {"text": "Reports a total endpoint count in the ballpark of 180-200", "passed": true, "evidence": "Reports 256 operations / 187 unique paths"},
+        {"text": "Provides a breakdown by HTTP method", "passed": true, "evidence": "GET 125, PUT 51, POST 44, DELETE 36"},
+        {"text": "Identifies at least 8 distinct resource groups", "passed": true, "evidence": "18 resource groups listed"},
+        {"text": "Correctly identifies authentication as API key + token query parameters", "passed": true, "evidence": "Dedicated auth section with APIKey + APIToken in query"},
+        {"text": "Identifies at least 3 complex schemas with property details", "passed": true, "evidence": "Top 10 schemas with property counts"},
+        {"text": "Overview is well-organized with clear sections", "passed": true, "evidence": "6 clear sections with tables"}
+      ]
+    },
+    {
+      "eval_name": "api-overview",
+      "configuration": "without_skill",
+      "pass_rate": 1.0,
+      "passed": 6,
+      "total": 6,
+      "time_seconds": 96,
+      "tokens": null,
+      "expectations": [
+        {"text": "Reports a total endpoint count in the ballpark of 180-200", "passed": true, "evidence": "Reports 187 paths and 256 operations"},
+        {"text": "Provides a breakdown by HTTP method", "passed": true, "evidence": "GET 125, PUT 51, POST 44, DELETE 36"},
+        {"text": "Identifies at least 8 distinct resource groups", "passed": true, "evidence": "18 resource groups with per-method breakdown"},
+        {"text": "Correctly identifies authentication as API key + token query parameters", "passed": true, "evidence": "Two API-key query parameters via query string"},
+        {"text": "Identifies at least 3 complex schemas with property details", "passed": true, "evidence": "Top 10 with property counts, ref counts, nested objects"},
+        {"text": "Overview is well-organized with clear sections", "passed": true, "evidence": "7 clear sections with tables"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0},
+      "time_seconds": {"mean": 82.3, "stddev": 28.7},
+      "tokens": {"mean": null, "stddev": null}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0},
+      "time_seconds": {"mean": 91.0, "stddev": 39.1},
+      "tokens": {"mean": null, "stddev": null}
+    },
+    "delta": {
+      "pass_rate": "+0.00",
+      "time_seconds": "-8.7",
+      "tokens": "N/A"
+    }
+  },
+  "notes": [
+    "All assertions pass for both with_skill and without_skill configurations",
+    "With-skill runs completed 8.7s faster on average (82.3s vs 91.0s)",
+    "Code generation task shows the largest time difference: 89s (with skill) vs 127s (without skill) — 30% faster",
+    "Output quality is very similar between configurations — Claude handles OpenAPI parsing well natively",
+    "The with_skill code-generation run also validated tests pass (87 tests, 0 failures)",
+    "Non-discriminating assertions: all 19 assertions pass in both configurations, meaning these test cases don't surface quality differences"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "eval_id": 2,
+  "eval_name": "code-generation",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Generated Label.swift contains 'struct Label'",
+      "passed": true,
+      "evidence": "File contains 'public struct Label: Codable, Sendable, Equatable'"
+    },
+    {
+      "text": "Label struct conforms to Codable, Sendable, and Equatable",
+      "passed": true,
+      "evidence": "Declaration: 'public struct Label: Codable, Sendable, Equatable'"
+    },
+    {
+      "text": "The 'id' field is a non-optional String",
+      "passed": true,
+      "evidence": "'public let id: String' — no optional marker"
+    },
+    {
+      "text": "Other properties like name, color are optional (String?)",
+      "passed": true,
+      "evidence": "idBoard: String?, name: String?, color: String? — all optional"
+    },
+    {
+      "text": "Has a public init with default nil values for optional parameters",
+      "passed": true,
+      "evidence": "public init(id: String, idBoard: String? = nil, name: String? = nil, color: String? = nil)"
+    },
+    {
+      "text": "LabelsAPI.swift has a TrelloClient extension with at least one label method",
+      "passed": true,
+      "evidence": "extension TrelloClient with getLabel(id:) and getBoardLabels(boardId:)"
+    },
+    {
+      "text": "Tests use Swift Testing framework (@Test, #expect or #require)",
+      "passed": true,
+      "evidence": "Uses @Suite, @Test, #expect, #require throughout. import Testing."
+    },
+    {
+      "text": "Model properties match the actual Label schema fields from the OpenAPI spec",
+      "passed": true,
+      "evidence": "Schema has id, idBoard, name, color. Model has id, idBoard, name, color. Exact match."
+    }
+  ]
+}

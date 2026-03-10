@@ -1,0 +1,47 @@
+{
+  "eval_id": 2,
+  "eval_name": "code-generation",
+  "prompt": "Looking at the trello-openapi.json spec, I need to generate a Swift model struct for the Label schema. It should follow the same patterns as the existing models in this project — conforming to Codable, Sendable, Equatable, with an init that has default nil values for optional fields. Also generate a corresponding endpoint method and basic tests.",
+  "assertions": [
+    {
+      "id": "label-struct-exists",
+      "text": "Generated Label.swift contains 'struct Label'",
+      "type": "file_content_check"
+    },
+    {
+      "id": "conforms-to-protocols",
+      "text": "Label struct conforms to Codable, Sendable, and Equatable",
+      "type": "file_content_check"
+    },
+    {
+      "id": "id-non-optional",
+      "text": "The 'id' field is a non-optional String (let id: String)",
+      "type": "file_content_check"
+    },
+    {
+      "id": "other-fields-optional",
+      "text": "Other properties like name, color are optional (String?)",
+      "type": "file_content_check"
+    },
+    {
+      "id": "init-with-defaults",
+      "text": "Has a public init with default nil values for optional parameters",
+      "type": "file_content_check"
+    },
+    {
+      "id": "endpoint-method-exists",
+      "text": "LabelsAPI.swift has a TrelloClient extension with at least one label-related method",
+      "type": "file_content_check"
+    },
+    {
+      "id": "tests-use-swift-testing",
+      "text": "Tests use Swift Testing framework (@Test, #expect or #require)",
+      "type": "file_content_check"
+    },
+    {
+      "id": "schema-fields-accurate",
+      "text": "Model properties match the actual Label schema fields from the OpenAPI spec",
+      "type": "accuracy_check"
+    }
+  ]
+}

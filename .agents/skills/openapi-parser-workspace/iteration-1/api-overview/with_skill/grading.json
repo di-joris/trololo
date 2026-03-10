@@ -1,0 +1,37 @@
+{
+  "eval_id": 3,
+  "eval_name": "api-overview",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Reports a total endpoint count in the ballpark of 180-200",
+      "passed": true,
+      "evidence": "Reports 256 total endpoints across 187 unique paths. 187 paths is in range; 256 is operations count."
+    },
+    {
+      "text": "Provides a breakdown by HTTP method",
+      "passed": true,
+      "evidence": "Table: GET 125, PUT 51, POST 44, DELETE 36"
+    },
+    {
+      "text": "Identifies at least 8 distinct resource groups",
+      "passed": true,
+      "evidence": "Lists 18 resource groups with operation counts: cards, boards, members, organizations, enterprises, actions, notifications, lists, checklists, tokens, plugins, customFields, webhooks, labels, search, emoji, batch, applications"
+    },
+    {
+      "text": "Correctly identifies authentication as API key + token query parameters",
+      "passed": true,
+      "evidence": "Dedicated Authentication section: 'query-parameter-based API key + token authentication' with table showing APIKey and APIToken as apiKey type in query"
+    },
+    {
+      "text": "Identifies at least 3 complex schemas with property details",
+      "passed": true,
+      "evidence": "Table of 10 most complex schemas with property counts: Member (42), Card (33), Board (26), Prefs (22), Enterprise (18), etc."
+    },
+    {
+      "text": "Overview is well-organized with clear sections",
+      "passed": true,
+      "evidence": "6 sections: Endpoint Summary, Resource Groups, Authentication, Schema Inventory, Most Parameter-Heavy Endpoints, Key Observations"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "eval_id": 1,
+  "eval_name": "endpoint-discovery",
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Lists at least 5 distinct checklist-related endpoint paths",
+      "passed": true,
+      "evidence": "Lists 17 endpoints across 6 groups covering standalone CRUD, check-items, relationships, field-level, board-level, and card-level"
+    },
+    {
+      "text": "Shows HTTP methods (GET, POST, PUT, DELETE) for the endpoints",
+      "passed": true,
+      "evidence": "Each endpoint header shows the HTTP method (GET, POST, PUT, DELETE)"
+    },
+    {
+      "text": "Lists query or path parameters for at least one endpoint",
+      "passed": true,
+      "evidence": "Detailed parameter tables for each endpoint with In, Required, Type, and Description columns"
+    },
+    {
+      "text": "Covers checkItems sub-resource endpoints",
+      "passed": true,
+      "evidence": "Section 2 dedicated to Check-Item Endpoints with GET, POST, GET, DELETE operations"
+    },
+    {
+      "text": "Output is organized in a structured, easy-to-scan format",
+      "passed": true,
+      "evidence": "Well-organized with 6 numbered sections, markdown tables per endpoint. Not raw JSON."
+    }
+  ]
+}

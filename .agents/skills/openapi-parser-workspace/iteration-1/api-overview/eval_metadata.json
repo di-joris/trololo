@@ -1,0 +1,37 @@
+{
+  "eval_id": 3,
+  "eval_name": "api-overview",
+  "prompt": "Give me a high-level overview of the Trello API surface from the trello-openapi.json file. How many endpoints are there? What are the main resource groups? What authentication method does it use? What are the most complex schemas?",
+  "assertions": [
+    {
+      "id": "endpoint-count",
+      "text": "Reports a total endpoint count in the ballpark of 180-200",
+      "type": "accuracy_check"
+    },
+    {
+      "id": "method-breakdown",
+      "text": "Provides a breakdown by HTTP method (GET, POST, PUT, DELETE)",
+      "type": "content_check"
+    },
+    {
+      "id": "resource-groups",
+      "text": "Identifies at least 8 distinct resource groups (boards, cards, members, lists, etc.)",
+      "type": "count_check"
+    },
+    {
+      "id": "auth-method",
+      "text": "Correctly identifies authentication as API key + token query parameters",
+      "type": "accuracy_check"
+    },
+    {
+      "id": "complex-schemas",
+      "text": "Identifies at least 3 complex schemas with details about their properties",
+      "type": "content_check"
+    },
+    {
+      "id": "well-structured",
+      "text": "Overview is well-organized with clear sections, not a raw data dump",
+      "type": "quality_check"
+    }
+  ]
+}
