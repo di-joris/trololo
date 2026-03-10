@@ -102,7 +102,7 @@ struct EnvironmentTests {
     // MARK: - Base Environment Contract
     // This test documents and validates the complete environment-loading contract.
     // The contract specifies:
-    // 1. Resolution order: base (process env) → .env (cwd) → ~/.config/trololo/env
+    // 1. Resolution order: base (process env) → .env (cwd) → $XDG_CONFIG_HOME/trololo/env (defaults to ~/.config/trololo/env)
     // 2. Priority: base environment values always override .env values (no overwriting)
     // 3. Early termination: stop processing paths once all requiredKeys are resolved
     // 4. Error handling: missing files are ignored; unreadable files throw only if needed

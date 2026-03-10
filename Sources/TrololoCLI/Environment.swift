@@ -15,16 +15,20 @@ enum EnvironmentError: Error, LocalizedError, Equatable, Sendable {
 ///
 /// Lookup order:
 /// 1. `.env` in the current working directory
-/// 2. `~/.config/trololo/env` (fallback)
+/// 2. `$XDG_CONFIG_HOME/trololo/env` (fallback; defaults to `~/.config/trololo/env`)
 ///
 /// Missing files are ignored. Real environment variables always take priority
 /// over values from `.env` files. Existing but unreadable files surface as
 /// errors while the CLI is still resolving missing required values.
 enum Environment {
-    static let defaultPaths = [
-        ".env",
-        NSString("~/.config/trololo/env").expandingTildeInPath,
-    ]
+    static var defaultPaths: [String] {
+        let xdgConfigHome = ProcessInfo.processInfo.environment["XDG_CONFIG_HOME"]
+            ?? NSString("~/.config").expandingTildeInPath
+        return [
+            ".env",
+            "\(xdgConfigHome)/trololo/env",
+        ]
+    }
 
     static func mergedEnvironment(
         base: [String: String] = ProcessInfo.processInfo.environment,
